@@ -56,243 +56,317 @@
 <!-- ===================================================== -->
 <div id="app" class="screen app-screen hidden">
 
-  <!-- ---------- HEADER ---------- -->
-  <header class="app-header">
-    <div>
-      <p class="header-greeting" id="header-greeting">Bonjour</p>
-      <h1 class="header-title">Mon patrimoine</h1>
+  <!-- ---------- SIDEBAR (desktop uniquement) ---------- -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="sidebar-brand-icon">📊</span>
+      <span class="sidebar-brand-text">Patrimoine</span>
     </div>
-    <button class="icon-btn" id="btn-settings" aria-label="Réglages">⚙️</button>
-  </header>
+    <button class="sidebar-link active" data-tab="tab-dashboard">
+      <span class="tab-icon">🏠</span><span>Aperçu</span>
+    </button>
+    <button class="sidebar-link" data-tab="tab-add">
+      <span class="tab-icon">➕</span><span>Ajouter</span>
+    </button>
+    <button class="sidebar-link" data-tab="tab-credits">
+      <span class="tab-icon">🏦</span><span>Crédits</span>
+    </button>
+    <button class="sidebar-link" data-tab="tab-assets">
+      <span class="tab-icon">📁</span><span>Mes actifs</span>
+    </button>
+    <button class="sidebar-link" data-tab="tab-settings">
+      <span class="tab-icon">⚙️</span><span>Réglages</span>
+    </button>
+  </nav>
 
-  <!-- ---------- NAVIGATION PAR ONGLETS ---------- -->
-  <main class="app-main" id="app-main">
+  <div class="app-body">
+    <!-- ---------- HEADER ---------- -->
+    <header class="app-header">
+      <div>
+        <p class="header-greeting" id="header-greeting">Bonjour</p>
+        <h1 class="header-title" id="header-title">Mon patrimoine</h1>
+      </div>
+      <button class="icon-btn mobile-only" id="btn-settings" aria-label="Réglages">⚙️</button>
+    </header>
 
-    <!-- ===== TAB: DASHBOARD ===== -->
-    <section class="tab-panel" id="tab-dashboard">
+    <!-- ---------- CONTENU PAR ONGLETS ---------- -->
+    <main class="app-main" id="app-main">
 
-      <div class="card hero-card">
-        <div class="hero-row">
-          <div class="hero-block">
-            <p class="hero-label">Patrimoine brut</p>
-            <p class="hero-value" id="val-brut">0,00 €</p>
+      <!-- ===== TAB: DASHBOARD ===== -->
+      <section class="tab-panel" id="tab-dashboard">
+
+        <div class="dashboard-grid">
+          <div class="card hero-card">
+            <div class="hero-row">
+              <div class="hero-block">
+                <p class="hero-label">Patrimoine brut</p>
+                <p class="hero-value" id="val-brut">0,00 €</p>
+              </div>
+              <div class="hero-block">
+                <p class="hero-label">Patrimoine net</p>
+                <p class="hero-value hero-value-accent" id="val-net">0,00 €</p>
+              </div>
+            </div>
+            <div class="hero-row hero-row-secondary">
+              <div class="hero-block-sm">
+                <p class="hero-label-sm">Actifs</p>
+                <p class="hero-value-sm" id="val-actifs">0,00 €</p>
+              </div>
+              <div class="hero-block-sm">
+                <p class="hero-label-sm">Passifs</p>
+                <p class="hero-value-sm hero-value-negative" id="val-passifs">0,00 €</p>
+              </div>
+              <div class="hero-block-sm">
+                <p class="hero-label-sm">Performance</p>
+                <p class="hero-value-sm" id="val-perf">0,00 %</p>
+              </div>
+            </div>
           </div>
-          <div class="hero-block">
-            <p class="hero-label">Patrimoine net</p>
-            <p class="hero-value hero-value-accent" id="val-net">0,00 €</p>
+
+          <div class="card chart-card">
+            <p class="card-title">Répartition du patrimoine</p>
+            <div class="chart-wrap">
+              <canvas id="chart-repartition" width="280" height="280"></canvas>
+            </div>
+            <div class="legend" id="chart-legend"></div>
           </div>
         </div>
-        <div class="hero-row hero-row-secondary">
-          <div class="hero-block-sm">
-            <p class="hero-label-sm">Actifs</p>
-            <p class="hero-value-sm" id="val-actifs">0,00 €</p>
+
+        <div class="asset-columns">
+          <div class="section-block">
+            <div class="section-head">
+              <h2 class="section-title">Épargne sécurisée</h2>
+            </div>
+            <div id="list-epargne" class="asset-list"></div>
           </div>
-          <div class="hero-block-sm">
-            <p class="hero-label-sm">Passifs</p>
-            <p class="hero-value-sm hero-value-negative" id="val-passifs">0,00 €</p>
+
+          <div class="section-block">
+            <div class="section-head">
+              <h2 class="section-title">Assurance vie</h2>
+            </div>
+            <div id="list-av" class="asset-list"></div>
           </div>
-          <div class="hero-block-sm">
-            <p class="hero-label-sm">Performance</p>
-            <p class="hero-value-sm" id="val-perf">0,00 %</p>
+
+          <div class="section-block">
+            <div class="section-head">
+              <h2 class="section-title">PEA — Actions / ETF</h2>
+            </div>
+            <div id="list-pea" class="asset-list"></div>
+          </div>
+
+          <div class="section-block">
+            <div class="section-head">
+              <h2 class="section-title">Cryptomonnaies</h2>
+            </div>
+            <div id="list-crypto" class="asset-list"></div>
+          </div>
+
+          <div class="section-block">
+            <div class="section-head">
+              <h2 class="section-title">Crédits en cours</h2>
+            </div>
+            <div id="list-credits" class="asset-list"></div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <p class="card-title">Répartition du patrimoine</p>
-        <div class="chart-wrap">
-          <canvas id="chart-repartition" width="280" height="280"></canvas>
-        </div>
-        <div class="legend" id="chart-legend"></div>
-      </div>
+        <p class="last-update" id="last-update">Dernière mise à jour : —</p>
+      </section>
 
-      <div class="section-block">
-        <div class="section-head">
-          <h2 class="section-title">Épargne sécurisée</h2>
-        </div>
-        <div id="list-epargne" class="asset-list"></div>
-      </div>
+      <!-- ===== TAB: AJOUTER (versements / retraits) ===== -->
+      <section class="tab-panel hidden" id="tab-add">
+        <h2 class="page-title">Nouvelle opération</h2>
+        <p class="page-subtitle">Pour ajouter un nouvel actif (nouveau livret, nouvelle action…), va dans <strong>Mes actifs</strong>.</p>
 
-      <div class="section-block">
-        <div class="section-head">
-          <h2 class="section-title">Assurance vie</h2>
-        </div>
-        <div id="list-av" class="asset-list"></div>
-      </div>
-
-      <div class="section-block">
-        <div class="section-head">
-          <h2 class="section-title">PEA — Actions / ETF</h2>
-        </div>
-        <div id="list-pea" class="asset-list"></div>
-      </div>
-
-      <div class="section-block">
-        <div class="section-head">
-          <h2 class="section-title">Cryptomonnaies</h2>
-        </div>
-        <div id="list-crypto" class="asset-list"></div>
-      </div>
-
-      <div class="section-block">
-        <div class="section-head">
-          <h2 class="section-title">Crédits en cours</h2>
-        </div>
-        <div id="list-credits" class="asset-list"></div>
-      </div>
-
-      <p class="last-update" id="last-update">Dernière mise à jour : —</p>
-    </section>
-
-    <!-- ===== TAB: AJOUTER (saisie) ===== -->
-    <section class="tab-panel hidden" id="tab-add">
-      <h2 class="page-title">Nouvelle opération</h2>
-
-      <div class="card">
-        <p class="card-title">Type d'opération</p>
-        <div class="segmented" id="op-type-segmented">
-          <button class="segmented-btn active" data-op="depot">Versement</button>
-          <button class="segmented-btn" data-op="retrait">Retrait</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <p class="card-title">Destination</p>
-        <div class="form-group">
-          <label class="form-label">Enveloppe</label>
-          <select id="select-enveloppe" class="form-input">
-            <option value="epargne">Épargne sécurisée</option>
-            <option value="av">Assurance vie</option>
-            <option value="pea">PEA — Actions / ETF</option>
-            <option value="crypto">Cryptomonnaie</option>
-          </select>
+        <div class="card">
+          <p class="card-title">Type d'opération</p>
+          <div class="segmented" id="op-type-segmented">
+            <button class="segmented-btn active" data-op="depot">Versement</button>
+            <button class="segmented-btn" data-op="retrait">Retrait</button>
+          </div>
         </div>
 
-        <!-- Sous-formulaire ÉPARGNE / AV : simple montant sur ligne existante ou nouvelle -->
-        <div class="form-group" id="group-simple-line">
-          <label class="form-label">Support</label>
-          <select id="select-simple-line" class="form-input">
-            <!-- rempli dynamiquement -->
-          </select>
-        </div>
-
-        <!-- Sous-formulaire PEA / CRYPTO : ticker, prix, quantité -->
-        <div class="hidden" id="group-market-line">
+        <div class="card">
+          <p class="card-title">Destination</p>
           <div class="form-group">
-            <label class="form-label">Actif</label>
-            <select id="select-market-ticker" class="form-input">
-              <!-- rempli dynamiquement selon enveloppe -->
+            <label class="form-label">Enveloppe</label>
+            <select id="select-enveloppe" class="form-input">
+              <option value="epargne">Épargne sécurisée</option>
+              <option value="av">Assurance vie</option>
+              <option value="pea">PEA — Actions / ETF</option>
+              <option value="crypto">Cryptomonnaie</option>
             </select>
+          </div>
+
+          <!-- Sous-formulaire ÉPARGNE / AV : simple montant sur ligne existante -->
+          <div class="form-group" id="group-simple-line">
+            <label class="form-label">Support</label>
+            <select id="select-simple-line" class="form-input">
+              <!-- rempli dynamiquement -->
+            </select>
+          </div>
+
+          <!-- Sous-formulaire PEA / CRYPTO : ticker, prix, quantité -->
+          <div class="hidden" id="group-market-line">
+            <div class="form-group">
+              <label class="form-label">Actif</label>
+              <select id="select-market-ticker" class="form-input">
+                <!-- rempli dynamiquement selon enveloppe -->
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group form-group-half">
+                <label class="form-label">Prix unitaire d'achat (€)</label>
+                <input type="number" inputmode="decimal" step="0.0001" id="input-prix-achat" class="form-input" placeholder="0,00">
+              </div>
+              <div class="form-group form-group-half">
+                <label class="form-label">Quantité</label>
+                <input type="number" inputmode="decimal" step="0.00000001" id="input-quantite" class="form-input" placeholder="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" id="group-montant-simple">
+            <label class="form-label">Montant (€)</label>
+            <input type="number" inputmode="decimal" step="0.01" id="input-montant" class="form-input" placeholder="0,00">
+          </div>
+
+          <div class="empty-state hidden" id="add-empty-state">
+            Aucune ligne dans cette enveloppe pour le moment. Va dans <strong>Mes actifs</strong> pour en créer une.
+          </div>
+
+          <button class="btn-primary" id="btn-valider-operation">Valider l'opération</button>
+        </div>
+      </section>
+
+      <!-- ===== TAB: PASSIFS (gestion crédits) ===== -->
+      <section class="tab-panel hidden" id="tab-credits">
+        <h2 class="page-title">Crédits</h2>
+        <p class="page-subtitle">Renseigne le montant emprunté, le taux et la durée : le capital restant dû se recalcule automatiquement selon la date de souscription.</p>
+
+        <div class="card">
+          <p class="card-title">Ajouter un crédit</p>
+          <div class="form-group">
+            <label class="form-label">Nom du crédit</label>
+            <input type="text" id="credit-nom" class="form-input" placeholder="Ex : Prêt immobilier">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Montant emprunté (€)</label>
+            <input type="number" inputmode="decimal" step="0.01" id="credit-montant" class="form-input" placeholder="0,00">
           </div>
           <div class="form-row">
             <div class="form-group form-group-half">
-              <label class="form-label">Prix unitaire d'achat (€)</label>
-              <input type="number" inputmode="decimal" step="0.0001" id="input-prix-achat" class="form-input" placeholder="0,00">
+              <label class="form-label">Taux d'intérêt annuel (%)</label>
+              <input type="number" inputmode="decimal" step="0.01" id="credit-taux" class="form-input" placeholder="0,00">
             </div>
             <div class="form-group form-group-half">
-              <label class="form-label">Quantité</label>
-              <input type="number" inputmode="decimal" step="0.00000001" id="input-quantite" class="form-input" placeholder="0">
+              <label class="form-label">Durée</label>
+              <input type="number" inputmode="numeric" id="credit-duree" class="form-input" placeholder="0">
             </div>
           </div>
-        </div>
-
-        <div class="form-group" id="group-montant-simple">
-          <label class="form-label">Montant (€)</label>
-          <input type="number" inputmode="decimal" step="0.01" id="input-montant" class="form-input" placeholder="0,00">
-        </div>
-
-        <button class="btn-primary" id="btn-valider-operation">Valider l'opération</button>
-      </div>
-    </section>
-
-    <!-- ===== TAB: PASSIFS (gestion crédits) ===== -->
-    <section class="tab-panel hidden" id="tab-credits">
-      <h2 class="page-title">Crédits</h2>
-
-      <div class="card">
-        <p class="card-title">Ajouter un crédit</p>
-        <div class="form-group">
-          <label class="form-label">Nom du crédit</label>
-          <input type="text" id="credit-nom" class="form-input" placeholder="Ex : Prêt immobilier">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Montant emprunté (€)</label>
-          <input type="number" inputmode="decimal" step="0.01" id="credit-montant" class="form-input" placeholder="0,00">
-        </div>
-        <div class="form-row">
-          <div class="form-group form-group-half">
-            <label class="form-label">Taux d'intérêt annuel (%)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="credit-taux" class="form-input" placeholder="0,00">
+          <div class="form-group">
+            <label class="form-label">Unité de durée</label>
+            <div class="segmented" id="credit-duree-unite">
+              <button class="segmented-btn active" data-unite="mois">Mois</button>
+              <button class="segmented-btn" data-unite="annees">Années</button>
+            </div>
           </div>
-          <div class="form-group form-group-half">
-            <label class="form-label">Durée</label>
-            <input type="number" inputmode="numeric" id="credit-duree" class="form-input" placeholder="0">
+          <div class="form-group">
+            <label class="form-label">Date de souscription</label>
+            <input type="date" id="credit-date-debut" class="form-input">
+          </div>
+          <button class="btn-primary" id="btn-ajouter-credit">Ajouter le crédit</button>
+        </div>
+
+        <div class="section-block">
+          <h2 class="section-title">Mes crédits</h2>
+          <div id="list-credits-detail" class="asset-list"></div>
+        </div>
+      </section>
+
+      <!-- ===== TAB: MES ACTIFS (gestion des lignes) ===== -->
+      <section class="tab-panel hidden" id="tab-assets">
+        <h2 class="page-title">Mes actifs</h2>
+        <p class="page-subtitle">Crée ici les lignes de chaque enveloppe. Une fois créées, utilise l'onglet <strong>Ajouter</strong> pour les approvisionner.</p>
+
+        <div class="asset-manage-grid">
+          <div class="card">
+            <div class="card-title-row">
+              <p class="card-title">Épargne sécurisée</p>
+              <button class="btn-add-small" data-add-simple="epargne">+ Ajouter</button>
+            </div>
+            <div id="manage-list-epargne" class="asset-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-row">
+              <p class="card-title">Assurance vie</p>
+              <button class="btn-add-small" data-add-simple="av">+ Ajouter</button>
+            </div>
+            <div id="manage-list-av" class="asset-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-row">
+              <p class="card-title">PEA — Actions / ETF</p>
+              <button class="btn-add-small" data-add-market="pea">+ Ajouter</button>
+            </div>
+            <div id="manage-list-pea" class="asset-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-row">
+              <p class="card-title">Cryptomonnaies</p>
+              <button class="btn-add-small" data-add-market="crypto">+ Ajouter</button>
+            </div>
+            <div id="manage-list-crypto" class="asset-list"></div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Unité de durée</label>
-          <div class="segmented" id="credit-duree-unite">
-            <button class="segmented-btn active" data-unite="mois">Mois</button>
-            <button class="segmented-btn" data-unite="annees">Années</button>
+      </section>
+
+      <!-- ===== TAB: RÉGLAGES ===== -->
+      <section class="tab-panel hidden" id="tab-settings">
+        <h2 class="page-title">Réglages</h2>
+
+        <div class="settings-grid">
+          <div class="card">
+            <p class="card-title">Sécurité</p>
+            <button class="btn-secondary" id="btn-change-pin">Changer le code PIN</button>
+          </div>
+
+          <div class="card">
+            <p class="card-title">Synchronisation</p>
+            <p class="settings-info" id="sync-status">Connexion à Firebase…</p>
+            <button class="btn-secondary" id="btn-force-refresh">Actualiser les cours maintenant</button>
+          </div>
+
+          <div class="card">
+            <p class="card-title">À propos</p>
+            <p class="settings-info">Patrimoine v1.1 — données stockées sur votre Firebase personnel. Les cours sont fournis par Finnhub et CoinGecko, convertis en euros.</p>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Date de début</label>
-          <input type="date" id="credit-date-debut" class="form-input">
-        </div>
-        <button class="btn-primary" id="btn-ajouter-credit">Ajouter le crédit</button>
-      </div>
+      </section>
 
-      <div class="section-block">
-        <h2 class="section-title">Mes crédits</h2>
-        <div id="list-credits-detail" class="asset-list"></div>
-      </div>
-    </section>
+    </main>
 
-    <!-- ===== TAB: RÉGLAGES ===== -->
-    <section class="tab-panel hidden" id="tab-settings">
-      <h2 class="page-title">Réglages</h2>
-
-      <div class="card">
-        <p class="card-title">Sécurité</p>
-        <button class="btn-secondary" id="btn-change-pin">Changer le code PIN</button>
-      </div>
-
-      <div class="card">
-        <p class="card-title">Synchronisation</p>
-        <p class="settings-info" id="sync-status">Connexion à Firebase…</p>
-        <button class="btn-secondary" id="btn-force-refresh">Actualiser les cours maintenant</button>
-      </div>
-
-      <div class="card">
-        <p class="card-title">Lignes d'actifs</p>
-        <p class="settings-info">Gérer ou supprimer une ligne existante.</p>
-        <div id="list-manage-lines" class="asset-list"></div>
-      </div>
-
-      <div class="card">
-        <p class="card-title">À propos</p>
-        <p class="settings-info">Patrimoine v1.0 — données stockées sur votre Firebase personnel. Les cours sont fournis par Finnhub et CoinGecko, convertis en euros.</p>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ---------- TAB BAR (style iOS) ---------- -->
-  <nav class="tab-bar">
-    <button class="tab-btn active" data-tab="tab-dashboard">
-      <span class="tab-icon">🏠</span><span class="tab-label">Aperçu</span>
-    </button>
-    <button class="tab-btn" data-tab="tab-add">
-      <span class="tab-icon">➕</span><span class="tab-label">Ajouter</span>
-    </button>
-    <button class="tab-btn" data-tab="tab-credits">
-      <span class="tab-icon">🏦</span><span class="tab-label">Crédits</span>
-    </button>
-    <button class="tab-btn" data-tab="tab-settings">
-      <span class="tab-icon">⚙️</span><span class="tab-label">Réglages</span>
-    </button>
-  </nav>
+    <!-- ---------- TAB BAR (mobile uniquement, style iOS) ---------- -->
+    <nav class="tab-bar mobile-only">
+      <button class="tab-btn active" data-tab="tab-dashboard">
+        <span class="tab-icon">🏠</span><span class="tab-label">Aperçu</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-add">
+        <span class="tab-icon">➕</span><span class="tab-label">Ajouter</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-credits">
+        <span class="tab-icon">🏦</span><span class="tab-label">Crédits</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-assets">
+        <span class="tab-icon">📁</span><span class="tab-label">Actifs</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-settings">
+        <span class="tab-icon">⚙️</span><span class="tab-label">Réglages</span>
+      </button>
+    </nav>
+  </div>
 
 </div>
 

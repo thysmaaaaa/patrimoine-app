@@ -48,6 +48,8 @@ input, select {
 }
 
 .hidden { display: none !important; }
+.mobile-only { display: block; }
+.desktop-only { display: none; }
 
 .screen {
   position: fixed;
@@ -195,8 +197,21 @@ input, select {
 ========================================================= */
 .app-screen {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background: var(--bg);
+}
+
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+/* ---- Sidebar (desktop only, hidden on mobile by default) ---- */
+.sidebar {
+  display: none;
 }
 
 .app-header {
@@ -239,6 +254,69 @@ input, select {
 }
 
 .tab-panel { display: flex; flex-direction: column; gap: 16px; }
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 0 4px;
+  margin-top: -10px;
+  line-height: 1.5;
+}
+
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.asset-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.asset-manage-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-title-row .card-title { margin-bottom: 0; }
+
+.btn-add-small {
+  background: var(--accent-blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.btn-add-small:active { opacity: 0.7; }
+
+.empty-state {
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
 
 /* =========================================================
    CARDS
@@ -288,6 +366,7 @@ input, select {
 }
 
 .hero-value-accent { color: var(--accent-green); }
+.hero-value-negative-strong { color: var(--accent-red); }
 
 .hero-label-sm {
   font-size: 11px;
@@ -620,23 +699,141 @@ select.form-input {
 }
 
 /* =========================================================
-   RESPONSIVE — desktop
+   RESPONSIVE — DESKTOP (vrai dashboard large)
 ========================================================= */
-@media (min-width: 600px) {
-  body { display: flex; justify-content: center; background: #0a0a0a; }
-  html { overflow: auto; }
+@media (min-width: 900px) {
+  html, body { overflow: auto; }
+  body { background: #000000; }
 
   .screen {
-    position: relative;
-    width: 420px;
-    height: 100vh;
-    max-height: 900px;
-    margin: 0 auto;
-    box-shadow: 0 0 60px rgba(0,0,0,0.6);
-    border-radius: 0;
+    position: fixed;
   }
 
-  .tab-bar { position: absolute; }
+  /* L'écran de verrouillage reste centré en colonne mobile-like */
+  .lock-screen {
+    width: 420px;
+    left: 50%;
+    margin-left: -210px;
+  }
+
+  /* --- App shell devient sidebar + contenu --- */
+  .app-screen {
+    flex-direction: row;
+  }
+
+  .mobile-only { display: none !important; }
+  .desktop-only { display: block; }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    flex-shrink: 0;
+    background: #0d0d0f;
+    border-right: 1px solid var(--separator);
+    padding: 24px 16px;
+    gap: 4px;
+    height: 100%;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px 24px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .sidebar-brand-icon { font-size: 20px; }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: left;
+  }
+
+  .sidebar-link .tab-icon { font-size: 17px; }
+
+  .sidebar-link:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .sidebar-link.active {
+    background: var(--bg-elevated);
+    color: var(--accent-blue);
+  }
+
+  .app-body {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-header {
+    padding: 28px 40px 16px;
+  }
+
+  .header-title { font-size: 30px; }
+
+  .app-main {
+    padding: 4px 40px 48px;
+    max-width: 1280px;
+  }
+
+  /* --- Dashboard : hero + chart côte à côte --- */
+  .dashboard-grid {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .hero-card { flex: 1.4; }
+  .chart-card { flex: 1; min-width: 320px; }
+
+  /* --- Colonnes d'actifs en grille 2 colonnes --- */
+  .asset-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+  }
+
+  .asset-manage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .settings-grid .card:last-child { grid-column: 1 / -1; }
+
+  /* --- Formulaires desktop : largeur contrainte --- */
+  #tab-add .card, #tab-credits .card {
+    max-width: 560px;
+  }
+
+  /* --- Modale devient une vraie boîte de dialogue centrée --- */
+  .modal-overlay {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-sheet {
+    width: 440px;
+    border-radius: 20px;
+    padding: 24px 24px 24px;
+  }
+
+  .modal-handle { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

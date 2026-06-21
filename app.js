@@ -168,7 +168,7 @@ function setGreeting() {
 // ============================================================
 
 function initTabNavigation() {
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
+  document.querySelectorAll(".tab-btn, .sidebar-link").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 }
@@ -177,14 +177,15 @@ function switchTab(tabId) {
   document.querySelectorAll(".tab-panel").forEach((panel) => {
     panel.classList.toggle("hidden", panel.id !== tabId);
   });
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
+  document.querySelectorAll(".tab-btn, .sidebar-link").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.tab === tabId);
   });
   document.getElementById("app-main").scrollTop = 0;
 
   if (tabId === "tab-add") populateAddForm();
   if (tabId === "tab-credits") renderCreditsDetailList();
-  if (tabId === "tab-settings") renderManageLines();
+  if (tabId === "tab-assets") renderManageAssetsLists();
+  if (tabId === "tab-settings") { /* rien de spécifique pour l'instant */ }
 }
 
 // ============================================================
@@ -255,7 +256,9 @@ function renderDashboard() {
   const perfGlobalePct = totalInvesti > 0 ? (perfGlobaleEur / totalInvesti) * 100 : 0;
 
   document.getElementById("val-brut").textContent = FinanceUtils.formatEUR(totalActifs);
-  document.getElementById("val-net").textContent = FinanceUtils.formatEUR(patrimoineNet);
+  const netEl = document.getElementById("val-net");
+  netEl.textContent = FinanceUtils.formatEUR(patrimoineNet);
+  netEl.className = "hero-value " + (patrimoineNet >= 0 ? "hero-value-accent" : "hero-value-negative-strong");
   document.getElementById("val-actifs").textContent = FinanceUtils.formatEUR(totalActifs);
   document.getElementById("val-passifs").textContent = FinanceUtils.formatEUR(totalPassifs);
   const perfEl = document.getElementById("val-perf");
@@ -359,8 +362,6 @@ function initAddForm() {
   });
 
   document.getElementById("select-enveloppe").addEventListener("change", populateAddForm);
-  document.getElementById("select-simple-line").addEventListener("change", onSimpleLineChange);
-  document.getElementById("select-market-ticker").addEventListener("change", onMarketTickerChange);
   document.getElementById("btn-valider-operation").addEventListener("click", validerOperation);
 }
 
@@ -375,10 +376,16 @@ function isMarketEnveloppe(env) {
 function populateAddForm() {
   const env = currentEnveloppe();
   const isMarket = isMarketEnveloppe(env);
+  const lignesDeLEnveloppe = State.lignes.filter((l) => l.enveloppe === env);
+  const estVide = lignesDeLEnveloppe.length === 0;
 
-  document.getElementById("group-simple-line").classList.toggle("hidden", isMarket);
-  document.getElementById("group-market-line").classList.toggle("hidden", !isMarket);
-  document.getElementById("group-montant-simple").classList.toggle("hidden", isMarket);
+  document.getElementById("group-simple-line").classList.toggle("hidden", isMarket || estVide);
+  document.getElementById("group-market-line").classList.toggle("hidden", !isMarket || estVide);
+  document.getElementById("group-montant-simple").classList.toggle("hidden", isMarket || estVide);
+  document.getElementById("add-empty-state").classList.toggle("hidden", !estVide);
+  document.getElementById("btn-valider-operation").classList.toggle("hidden", estVide);
+
+  if (estVide) return;
 
   if (isMarket) {
     populateMarketTickerSelect(env);
@@ -390,65 +397,57 @@ function populateAddForm() {
 function populateSimpleLineSelect(env) {
   const select = document.getElementById("select-simple-line");
   const lignes = State.lignes.filter((l) => l.enveloppe === env);
-  const options = lignes
+  select.innerHTML = lignes
     .map((l) => `<option value="${l.id}">${escapeHtml(l.nom)}</option>`)
     .join("");
-  select.innerHTML = options + `<option value="__new__">+ Nouveau support…</option>`;
 }
 
 function populateMarketTickerSelect(env) {
   const select = document.getElementById("select-market-ticker");
   const lignes = State.lignes.filter((l) => l.enveloppe === env);
-  const options = lignes
+  select.innerHTML = lignes
     .map((l) => `<option value="${l.id}">${escapeHtml(l.nom)} (${l.ticker})</option>`)
     .join("");
-  select.innerHTML = options + `<option value="__new__">+ Nouvel actif…</option>`;
 }
 
-function onSimpleLineChange() {
-  const value = document.getElementById("select-simple-line").value;
-  if (value === "__new__") {
-    promptNewSimpleLine();
-  }
-}
+// ============================================================
+// 4bis. CRÉATION DE NOUVELLES LIGNES (depuis "Mes actifs")
+// ============================================================
 
-function onMarketTickerChange() {
-  const value = document.getElementById("select-market-ticker").value;
-  if (value === "__new__") {
-    promptNewMarketLine();
-  }
-}
-
-function promptNewSimpleLine() {
-  const env = currentEnveloppe();
+function promptNewSimpleLine(env) {
   const envLabel = env === "epargne" ? "Épargne sécurisée" : "Assurance vie";
   openModal(
     `Nouveau support — ${envLabel}`,
     `<div class="form-group">
        <label class="form-label">Nom (ex : Livret A, Fonds en euros…)</label>
        <input type="text" id="modal-input-nom" class="form-input" placeholder="Nom du support">
+     </div>
+     <div class="form-group">
+       <label class="form-label">Solde actuel (€) — optionnel</label>
+       <input type="number" inputmode="decimal" step="0.01" id="modal-input-solde" class="form-input" placeholder="0,00">
      </div>`,
     () => {
       const nom = document.getElementById("modal-input-nom").value.trim();
       if (!nom) { showToast("Merci de saisir un nom"); return false; }
+      const soldeInitial = parseFloat(document.getElementById("modal-input-solde").value) || 0;
       const newLine = {
         id: generateId(),
         enveloppe: env,
         nom,
-        solde: 0,
-        montantInvesti: 0,
+        solde: soldeInitial,
+        montantInvesti: soldeInitial,
       };
       State.lignes.push(newLine);
       saveStateToFirebase();
-      populateSimpleLineSelect(env);
-      document.getElementById("select-simple-line").value = newLine.id;
+      showToast("Support ajouté");
+      renderManageAssetsLists();
+      renderDashboard();
       return true;
     }
   );
 }
 
-function promptNewMarketLine() {
-  const env = currentEnveloppe();
+function promptNewMarketLine(env) {
   const isCrypto = env === "crypto";
   const cryptoOptions = MarketAPI.SUPPORTED_CRYPTO.map(
     (sym) => `<option value="${sym}">${sym}</option>`
@@ -493,8 +492,8 @@ function promptNewMarketLine() {
       };
       State.lignes.push(newLine);
       saveStateToFirebase();
-      populateMarketTickerSelect(env);
-      document.getElementById("select-market-ticker").value = newLine.id;
+      showToast("Actif ajouté — renseigne un achat depuis l'onglet Ajouter");
+      renderManageAssetsLists();
       refreshQuotesForState();
       return true;
     }
@@ -662,23 +661,43 @@ function renderCreditsDetailList() {
 }
 
 // ============================================================
-// 6. RÉGLAGES — gestion des lignes existantes
+// 6. MES ACTIFS — gestion et création des lignes
 // ============================================================
 
-function renderManageLines() {
-  const container = document.getElementById("list-manage-lines");
-  if (State.lignes.length === 0) {
-    container.innerHTML = `<div class="empty-row">Aucune ligne enregistrée</div>`;
+function initAssetsTab() {
+  document.querySelectorAll("[data-add-simple]").forEach((btn) => {
+    btn.addEventListener("click", () => promptNewSimpleLine(btn.dataset.addSimple));
+  });
+  document.querySelectorAll("[data-add-market]").forEach((btn) => {
+    btn.addEventListener("click", () => promptNewMarketLine(btn.dataset.addMarket));
+  });
+}
+
+function renderManageAssetsLists() {
+  renderManageAssetGroup("manage-list-epargne", "epargne");
+  renderManageAssetGroup("manage-list-av", "av");
+  renderManageAssetGroup("manage-list-pea", "pea");
+  renderManageAssetGroup("manage-list-crypto", "crypto");
+}
+
+function renderManageAssetGroup(containerId, env) {
+  const container = document.getElementById(containerId);
+  const lignes = State.lignes.filter((l) => l.enveloppe === env);
+
+  if (lignes.length === 0) {
+    container.innerHTML = `<div class="empty-row">Aucune ligne pour le moment</div>`;
     return;
   }
-  container.innerHTML = State.lignes
+
+  container.innerHTML = lignes
     .map((l) => {
       const label = l.ticker ? `${l.nom} (${l.ticker})` : l.nom;
+      const v = computeLineValuation(l);
       return `
         <div class="asset-row">
           <div class="asset-info">
             <span class="asset-name">${escapeHtml(label)}</span>
-            <span class="asset-sub">${envLabelOf(l.enveloppe)}</span>
+            <span class="asset-sub">${FinanceUtils.formatEUR(v.valeur)}</span>
           </div>
           <button class="btn-secondary btn-danger" style="padding:8px 12px;font-size:13px;width:auto;" data-delete-line="${l.id}">Supprimer</button>
         </div>`;
@@ -687,9 +706,10 @@ function renderManageLines() {
 
   container.querySelectorAll("[data-delete-line]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (!confirm("Supprimer cette ligne ? Cette action est irréversible.")) return;
       State.lignes = State.lignes.filter((l) => l.id !== btn.dataset.deleteLine);
       saveStateToFirebase();
-      renderManageLines();
+      renderManageAssetsLists();
       renderDashboard();
     });
   });
@@ -849,6 +869,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTabNavigation();
   initAddForm();
   initCreditsForm();
+  initAssetsTab();
   initModal();
   initSettingsTab();
 

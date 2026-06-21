@@ -11,15 +11,13 @@
 // --- 1. FIREBASE ---
 // Récupère cet objet depuis la console Firebase :
 // Paramètres du projet > Vos applications > SDK (config)
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCXq5-SJ61VqwfQ4LoqpPyPSNqEtnjTV_I",
   authDomain: "mon-patrimoine-c7fcd.firebaseapp.com",
   projectId: "mon-patrimoine-c7fcd",
   storageBucket: "mon-patrimoine-c7fcd.firebasestorage.app",
   messagingSenderId: "699368084003",
-  appId: "1:699368084003:web:bc5850b1032b3ac2601796",
-  measurementId: "G-0RG0RN7N0K"
+  appId: "1:699368084003:web:bc5850b1032b3ac2601796"
 };
 
 // --- 2. API BOURSE (Finnhub) ---
